@@ -1,70 +1,7 @@
 import { PrismaService } from '@/lib/prisma/prisma.service';
+import { couponSeedData, planSeedData } from '@/lib/stripe/stripe.data';
 import { StripeService } from '@/lib/stripe/stripe.service';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { PlanType } from '@prisma/client';
-
-const planData = [
-  {
-    title: 'Gold Package',
-    planType: PlanType.GOLD,
-    description: 'Gold plan for boat owners',
-    benefits: [
-      'List in minutes!',
-      'Fast, affordable, effective!',
-      'Entry-Level Package Maximum Exposure!',
-      'No social media drama - just real buyers!',
-      '5 Pics and 500 word description!',
-      'One month FREE plan opportunity with promo code!',
-      'No overpay to sell your boat!',
-    ],
-    picLimit: 5,
-    wordLimit: 500,
-    isBest: false,
-    currency: 'usd',
-    price: 9.99,
-    billingPeriodMonths: 1,
-  },
-  {
-    title: 'Platinum Package',
-    planType: PlanType.PLATINUM,
-    description: 'Platinum plan for boat owners',
-    benefits: [
-      'List in minutes!',
-      'Fast, affordable, effective!',
-      'More space, more visuals, more opportunity!',
-      'No social media drama - just real buyers!',
-      '10 Pics and 1000 word description!',
-      '2 months FREE plan opportunity with promo code',
-      'No overpay to sell your boat!',
-    ],
-    picLimit: 10,
-    wordLimit: 1000,
-    isBest: true,
-    currency: 'usd',
-    price: 15.99,
-    billingPeriodMonths: 1,
-  },
-  {
-    title: 'Diamond Elite Brokerage',
-    planType: PlanType.DIAMOND,
-    description: 'Diamond plan for boat owners',
-    benefits: [
-      'Brokers & Pro Sales Agencies',
-      'Fast, affordable, effective!',
-      'Multiple listings included under one package!',
-      'Showcase like a pro!',
-      '75 Pics and 5000 word description!',
-      '2 months FREE plan opportunity with promo code',
-      'No overpay to sell your boat!',
-    ],
-    picLimit: 75,
-    wordLimit: 5000,
-    isBest: false,
-    currency: 'usd',
-    price: 29.99,
-    billingPeriodMonths: 1,
-  },
-];
 
 @Injectable()
 export class SubscriptionPlanService implements OnModuleInit {
@@ -76,11 +13,16 @@ export class SubscriptionPlanService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
+    // seed plans
     await this.seedPlans();
+    // wait for 5 seconds before seeding coupons
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    // seed coupons
+    await this.seedCoupons();
   }
 
   async seedPlans() {
-    for (const plan of planData) {
+    for (const plan of planSeedData) {
       const existingPlan = await this.prisma.subscriptionPlan.findFirst({
         where: { planType: plan.planType },
       });
@@ -110,6 +52,8 @@ export class SubscriptionPlanService implements OnModuleInit {
           },
         });
 
+        this.logger.log(`[CREATED] DB Plan: ${plan.title}`);
+
         continue;
       }
 
@@ -129,6 +73,64 @@ export class SubscriptionPlanService implements OnModuleInit {
       });
 
       this.logger.log(`[CREATED] DB Plan: ${plan.title}`);
+    }
+  }
+
+  async seedCoupons() {
+    for (const coupon of couponSeedData) {
+      // 1. Find plan
+      const plan = await this.prisma.subscriptionPlan.findFirst({
+        where: { planType: coupon.planType },
+      });
+
+      if (!plan) {
+        this.logger.error(
+          `[SKIP] Plan not found for ${coupon.planType}, skipping coupon...`,
+        );
+        continue;
+      }
+
+      // 2. Check DB
+      const existingPromo = await this.prisma.promoCode.findFirst({
+        where: { code: coupon.code },
+      });
+
+      if (existingPromo) {
+        this.logger.log(
+          `[EXIST] PromoCode ${coupon.code} already exists in DB, skipping DB create...`,
+        );
+        continue;
+      }
+
+      // 3. Check Stripe
+      let stripeCoupon = await this.stripe.getCouponByPlanType(coupon.planType);
+
+      if (!stripeCoupon) {
+        stripeCoupon = await this.stripe.createStripeCoupon(
+          coupon.discount,
+          coupon.planType,
+        );
+        this.logger.log(
+          `[CREATED] Stripe Coupon ${stripeCoupon.id} (${coupon.code})`,
+        );
+      } else {
+        this.logger.log(
+          `[REUSE] Reusing Stripe Coupon ${stripeCoupon.id} for ${coupon.code}`,
+        );
+      }
+
+      // 4. Create Promo in DB
+      await this.prisma.promoCode.create({
+        data: {
+          code: coupon.code,
+          discount: coupon.discount,
+          freeMonths: coupon.freeMonths,
+          planId: plan.id,
+          stripeCouponId: stripeCoupon.id,
+        },
+      });
+
+      this.logger.log(`[CREATED] DB PromoCode: ${coupon.code}`);
     }
   }
 }

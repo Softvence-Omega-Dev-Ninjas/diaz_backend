@@ -5,7 +5,6 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { Prisma, PrismaClient } from '@prisma/client';
-import chalk from 'chalk';
 
 @Injectable()
 export class PrismaService
@@ -25,12 +24,12 @@ export class PrismaService
   }
 
   async onModuleInit() {
-    console.info(chalk.bgGreen.white.bold('🚀 Prisma connected'));
+    this.logger.log('[INIT] Prisma connected');
     await this.$connect();
   }
 
   async onModuleDestroy() {
-    console.info(chalk.bgRed.white.bold('🚫 Prisma disconnected'));
+    this.logger.log('[DESTROY] Prisma disconnected');
     await this.$disconnect();
   }
 }

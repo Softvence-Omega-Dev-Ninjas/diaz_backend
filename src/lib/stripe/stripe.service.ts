@@ -59,7 +59,49 @@ export class StripeService {
       limit: 1,
     });
 
+    if (prices.data.length === 0) {
+      this.logger.log(`No Stripe price found for plan type ${planType}`);
+      return null;
+    }
+
+    this.logger.log(
+      `Found Stripe price ${prices.data[0].id} for plan type ${planType}`,
+    );
+
     return prices.data[0] ?? null;
+  }
+
+  // Coupons management
+  async createStripeCoupon(
+    discount: number,
+    planType: PlanType,
+    duration: 'forever' | 'repeating' | 'once' = 'forever',
+  ) {
+    const couponId = this.generateCouponId(planType);
+    return await this.stripe.coupons.create({
+      id: couponId,
+      percent_off: discount,
+      duration,
+    });
+  }
+
+  async getCouponByPlanType(planType: PlanType) {
+    const couponId = this.generateCouponId(planType);
+
+    try {
+      const coupon = await this.stripe.coupons.retrieve(couponId);
+
+      this.logger.log(
+        `Retrieved Stripe coupon ${coupon.id} for plan type ${planType}`,
+      );
+
+      return coupon;
+    } catch (error) {
+      this.logger.error(
+        `Error retrieving Stripe coupon for plan type ${planType}: ${error}`,
+      );
+      return null;
+    }
   }
 
   // Webhook Utility
@@ -79,7 +121,11 @@ export class StripeService {
     }
   }
 
-  private generateLookUpKey(planType: PlanType) {
+  public generateLookUpKey(planType: PlanType) {
     return `subscription:${planType.toLowerCase()}:usd:month`;
+  }
+
+  public generateCouponId(planType: PlanType) {
+    return `coupon_${planType.toLowerCase()}`;
   }
 }
