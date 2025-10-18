@@ -1,18 +1,18 @@
 services:
   server:
     platform: linux/amd64
-    image: sajibsv/elad_giserman_server:latest
-    container_name: elad_giserman_api
+    image: softvence/diaz_backend_server:latest
+    container_name: diaz_backend_api
     restart: always
     environment:
       NODE_ENV: 'production'
-      DATABASE_URL: 'postgresql://postgres:postgres@db:5432/elad_giserman_db'
+      DATABASE_URL: 'postgresql://postgres:postgres@db:5432/diaz_backend_db'
 
       JWT_SECRET: 'secret'
       JWT_EXPIRES_IN: 90d
 
       BASE_URL: 'https://lgcglobalcontractingltd.com/js'
-      PORT: 5050
+      PORT: 5051
 
       MAIL_USER: 'arafatmannan2019@gmail.com'
       MAIL_PASS: 'eurp zvyi gnoy enag'
@@ -31,7 +31,7 @@ services:
       FIREBASE_PRIVATE_KEY: '-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDaMVd6X/14iCP9\nQxbH6nufirUwuj0JvKRjrpDQF5R6v1BHonNhb9WB9aMHrr21K5WlQh8FBKgjQ1II\nokEakd/l7fpNHNHm7xvADNrpUUOZb29gnWUuctW1ngrpBPExCskHtv/0Y7O37DWu\n3/rnJ3SrFHqinLRzkKHGJuHtOb19lEqFFDJyJ+kEHRTjl1lUdF9jPKDlKvWD7qS/\ngV2edEWB53xcV7TAjMRyJMEM3PlCATGnEtuAH8XqaNcY4hJ7V9WPuvKyB/fXc81U\nMoXuPAswaVQ1VSlk0BVLs9tf1DpK/XpvAV238Vp0ykheMTWlJKLDjePjzTdUJ8D9\nYIB3LZoVAgMBAAECggEACeXlHwMNv5MFdu69MNJ9Sy6Cq7Q3IqLxHiiEHzyCmtLk\n9Gr1Kv1kxSF8hNOzfW19u2J1f8fHTNo39XZO18K4UnjqOudMyloceyjaIW1zUJmS\nhuJ8/Y9uDHAf9JQp0Ny5Y+U0VUTUmUpY4Rb+DdBnZX9nVMshEIEGJbQL2bQd2X10\nNO/9VDo70AUbi4fbmIROQ23nVlBAJFHutHKwtILQ7lZbXYRkwm/v2HbnreMr+W5u\nAtL/q09x3j4aNP0VKtkdcXBbronrJrRWp3HAHON3Rm9rxzdb01R6h3v0BH+rNP4J\noyLyYjIlkQrkO6j92bjPfAjRRK1TVrKUnQJVvB2swQKBgQDyKhxJjqZmGEpLPeM6\nDQuQqT/XKM0rTkVuY3NDsJznIi4VY2+5/qe4FogGPALfWAaAle4yoTayqEabf+RS\nudCh2XJ28/QkzFQhmauXJDF5QUI0jzoqQu5lPp5GNtUZuYdaB7Iz0VUFq6ovQJvU\np49OHo+PlIfmdBM1Qwsl1kxUcQKBgQDmqJ8F43UbvdkyeOSBENNBnij7UMQ4NPc5\nbT4i8/8Gyd74l5/iDxLrbg+V+rai8kwGowKErbuYPIoKbASJxaMTdbgRwIXbxdm4\nUbLMzro3h2shfQUfGvd8N5SMmLTBRoaw9uM5pXeVWb91+pqscjQCrsioZRdVLcHE\n2l7DCfuh5QKBgH91Rpo4qMBHvKLJmhVt1E55po5afVJzyfuGAJ76EDtfNB4xzhZ5\nQFGWGlYds+1V6WY4g7zGOYHjK/agY85e2r61MpgFYtUTbpyYw0Wz2Q5XGL+NOzIP\nNGa5hJi0N4loqyLpthOr9DId3l8shFhzMOwPDcSmirjzE0EPXoi1uEshAoGAWHzb\n9PBb3vaoOnqyfukrgoLgiflkLYP0TC2iptogPkR3q7rPdXP++B7TD+CM7Foz3F/w\n+WGFFFQ1SOZDn28YrsB8iyLmt3dhnRqKk5PDUMY8zS4fJt27kAXqkT2MKpGZ3o34\nggb+p2c00lf/uqRdW6IeDKwrlVvmeFSmAgD0bhkCgYAlqSg0aMumoWi6juJVR7gH\nq0trHd/QI3KWmEveXKWvVWxOc0zbexQ+JAOVNGwuqpj0m2iLlaYK+mIyMqqRykUn\nA7EkgOYFw1rDUfXcjV3CGwvhduQ+hxyGKWBH86QG0BOacWxkeRhTMh32bQc9lo78\nN3fL9jiD3l/V0SM/n1yDDg==\n-----END PRIVATE KEY-----\n'
 
     ports:
-      - '5050:5050'
+      - '5051:5051'
     depends_on:
       - db
       - redis
@@ -48,25 +48,25 @@ services:
 
   db:
     image: postgres
-    container_name: elad_giserman_db
+    container_name: diaz_backend_db
     restart: always
     user: postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: elad_giserman_db
+      POSTGRES_DB: diaz_backend_db
     volumes:
-      - elad_giserman_data:/var/lib/postgresql/data
+      - diaz_backend_data:/var/lib/postgresql/data
     ports:
-      - '5448:5432'
+      - '5433:5432'
 
   redis:
     image: redis
-    container_name: elad_giserman_redis
+    container_name: diaz_backend_redis
     restart: always
     ports:
-      - '6383:6379'
+      - '6384:6379'
 
 volumes:
-  elad_giserman_data:
+  diaz_backend_data:
   files-data:

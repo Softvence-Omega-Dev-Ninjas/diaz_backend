@@ -1,5 +1,5 @@
 # Docker image name
-APP_IMAGE := sajibsv/elad_giserman_server:latest
+APP_IMAGE := softvence/diaz_backend_server:latest
 
 # Compose file
 COMPOSE_FILE := compose.yaml
@@ -34,11 +34,11 @@ restart: down up
 
 # Show logs of the app container
 logs:
-	docker compose -f $(COMPOSE_FILE) logs -f elad_giserman_api
+	docker compose -f $(COMPOSE_FILE) logs -f diaz_backend_api
 
 # Cleanup everything
 clean: down
-	docker volume rm elad_giserman_data files-data || true
+	docker volume rm diaz_backend_data files-data || true
 	docker rmi $(APP_IMAGE) || true
 
 # Push to Docker Hub
