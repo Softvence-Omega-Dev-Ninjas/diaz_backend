@@ -1,6 +1,6 @@
 import { PrismaService } from '@/lib/prisma/prisma.service';
 import { StripeService } from '@/lib/stripe/stripe.service';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { PlanType } from '@prisma/client';
 
 const planData = [
@@ -67,7 +67,7 @@ const planData = [
 ];
 
 @Injectable()
-export class SubscriptionPlanService {
+export class SubscriptionPlanService implements OnModuleInit {
   private readonly logger = new Logger(SubscriptionPlanService.name);
 
   constructor(
@@ -75,39 +75,60 @@ export class SubscriptionPlanService {
     private readonly stripe: StripeService,
   ) {}
 
+  async onModuleInit() {
+    await this.seedPlans();
+  }
+
   async seedPlans() {
     for (const plan of planData) {
-      // 1. Check if plan already exists
       const existingPlan = await this.prisma.subscriptionPlan.findFirst({
         where: { planType: plan.planType },
       });
 
       if (existingPlan) {
-        this.logger.log(`[EXIST] ${plan.title} already exists, skipping...`);
+        this.logger.log(
+          `[EXIST] ${plan.title} already exists in DB, skipping DB create...`,
+        );
         continue;
       }
 
-      // 2. Create Stripe Product & Price
-      const { product, stripePrice } = await this.stripe.createProductWithPrice(
-        {
-          title: plan.title,
-          description: plan.description,
-          price: plan.price,
-        },
+      // Check for existing Stripe price
+      const existingPrice = await this.stripe.getActivePriceByPlanType(
+        plan.planType,
       );
 
-      // 3. Create Plan in DB
+      if (existingPrice) {
+        this.logger.log(
+          `[REUSE] Reusing price ${existingPrice.id} for ${plan.planType}`,
+        );
+
+        await this.prisma.subscriptionPlan.create({
+          data: {
+            ...plan,
+            stripeProductId: existingPrice.product as string,
+            stripePriceId: existingPrice.id,
+          },
+        });
+
+        continue;
+      }
+
+      const { stripePrice } = await this.stripe.createProductWithPrice({
+        title: plan.title,
+        description: plan.description,
+        price: plan.price,
+        planType: plan.planType,
+      });
+
       await this.prisma.subscriptionPlan.create({
         data: {
           ...plan,
-          stripeProductId: product.id,
+          stripeProductId: stripePrice.product as string,
           stripePriceId: stripePrice.id,
         },
       });
 
-      this.logger.log(
-        `[CREATED] ${plan.title} created with Product(${product.id}) & Price(${stripePrice.id})`,
-      );
+      this.logger.log(`[CREATED] DB Plan: ${plan.title}`);
     }
   }
 }
