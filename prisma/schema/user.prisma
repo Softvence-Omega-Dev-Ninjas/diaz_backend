@@ -43,6 +43,7 @@ model User {
   currentPlanStatus SubscriptionStatus? // ensure during successful payment in webhook
 
   userSubscription UserSubscription[]
+  invoices         Invoice[]
 
   // Notifications
   notifications UserNotification[]

@@ -1,4 +1,4 @@
-import { UserLanguage, UserRole, UserStatus } from '@prisma/client';
+import { SubscriptionStatus, UserRole, UserStatus } from '@prisma/client';
 import { Expose } from 'class-transformer';
 
 export class UserResponseDto {
@@ -12,9 +12,11 @@ export class UserResponseDto {
   @Expose()
   username: string;
 
-  // ===== Contact =====
   @Expose()
-  mobile?: string;
+  googleId?: string;
+
+  @Expose()
+  phone?: string;
 
   // ===== Profile =====
   @Expose()
@@ -22,6 +24,19 @@ export class UserResponseDto {
 
   @Expose()
   avatarUrl: string;
+
+  // ===== Address =====
+  @Expose()
+  country?: string;
+
+  @Expose()
+  city?: string;
+
+  @Expose()
+  state?: string;
+
+  @Expose()
+  zip?: string;
 
   // ===== Settings =====
   @Expose()
@@ -34,13 +49,14 @@ export class UserResponseDto {
   isVerified: boolean;
 
   @Expose()
-  timezone: string;
+  stripeCustomerId?: string;
+
+  // ===== Subscription overview =====
+  @Expose()
+  currentPlanId?: string;
 
   @Expose()
-  language: UserLanguage;
-
-  @Expose()
-  allowNotification: boolean;
+  currentPlanStatus?: SubscriptionStatus;
 
   // ===== Activity tracking =====
   @Expose()

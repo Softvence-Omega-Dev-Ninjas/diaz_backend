@@ -2,33 +2,37 @@ model SubscriptionPlan {
   id String @id @default(uuid())
 
   title       String
+  planType    PlanType
   description String?
   benefits    String[] // Array of text lines
+  picLimit    Int      @default(5)
+  wordLimit   Int      @default(500)
 
-  isPopular Boolean @default(false)
-  isActive  Boolean @default(true)
+  isBest Boolean @default(false)
 
   stripeProductId String @unique
-  stripePriceId   String @unique // will be changed when price or billing period changes
+  stripePriceId   String @unique
 
-  currency             String        @default("usd")
-  price                Float // Stored in smallest currency unit (e.g., cents) for Stripe
-  billingPeriod        BillingPeriod
-  discountPercent      Int           @default(0) // optional discount shown in UI
-  priceWithoutDiscount Float // price without discount
+  currency String @default("usd")
+  price    Float
+
+  billingPeriodMonths Int @default(1) // How many months per billing cycle
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  user             User[] // for a direct link, overwrite the previous one for a user
-  userSubscription UserSubscription[] // for details with transactions history
+  // Relations
+  userSubscriptions UserSubscription[]
+  promoCodes        PromoCode[]
+  users             User[]
 
   @@map("subscription_plans")
 }
 
-enum BillingPeriod {
-  MONTHLY
-  YEARLY
+enum PlanType {
+  GOLD
+  PLATINUM
+  DIAMOND
 }
 
 model UserSubscription {
@@ -40,30 +44,92 @@ model UserSubscription {
   planId String
   plan   SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
 
-  stripeTransactionId String @unique // payment_intent_id or checkout_session.payment_intent
+  stripeTransactionId String @unique
 
-  status SubscriptionStatus @default(PENDING) // one active plan at a time per user
+  status SubscriptionStatus @default(PENDING) // System-managed via Stripe webhooks
 
-  planStartedAt DateTime @default(now())
-  planEndedAt   DateTime // calculated based on billing period
+  planStartedAt DateTime  @default(now())
+  planEndedAt   DateTime? // Calculated dynamically based on plan billing period + freeMonths
 
-  paidAt   DateTime?
-  failedAt DateTime?
+  trialEndsAt DateTime? // If promo code gives free months
+  paidAt      DateTime?
+  failedAt    DateTime?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  promoCodeId String?
+  promoCode   PromoCode? @relation(fields: [promoCodeId], references: [id], onDelete: SetNull)
+
+  billingCycle Int @default(0) // Counts how many billing periods have been completed
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
+  Invoice   Invoice[]
 
   @@map("user_subscriptions")
 }
 
 enum SubscriptionStatus {
-  TRIALING
-  ACTIVE
-  FAILED
+  TRIALING // User is in trial period via promo code
+  ACTIVE // Fully paid and subscription is active
+  PAST_DUE // Payment failed but subscription may still be active temporarily
+  CANCELED // User canceled subscription or ended after trial
+  EXPIRED // Subscription period ended without renewal
+  PENDING // Payment/checkout started but not completed
+  INCOMPLETE // Checkout incomplete or failed (Stripe-specific)
+  INCOMPLETE_EXPIRED // Checkout incomplete and expired
+}
+
+/// Promo codes table
+model PromoCode {
+  id String @id @default(uuid())
+
+  code           String    @unique
+  discount       Float? // Percentage discount
+  freeMonths     Int? // free months applied on subscription
+  maxRedemptions Int? // limit number of uses
+  expiresAt      DateTime?
+
+  planId String
+  plan   SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  usedBy UserSubscription[] // Track which users used this code
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@map("promo_codes")
+}
+
+model Invoice {
+  id String @id @default(uuid())
+
+  stripeInvoiceId String @unique
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  subscriptionId String
+  subscription   UserSubscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  amount   Float
+  currency String @default("usd")
+
+  status InvoiceStatus // System-managed via Stripe webhooks
+
+  paidAt   DateTime?
+  dueAt    DateTime?
+  failedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@map("invoices")
+}
+
+enum InvoiceStatus {
+  UPCOMING
+  PAID
   PAST_DUE
-  CANCELED
-  PENDING
-  INCOMPLETE
-  INCOMPLETE_EXPIRED
-  UNPAID
+  FAILED
+  VOID
+  REFUNDED
 }
