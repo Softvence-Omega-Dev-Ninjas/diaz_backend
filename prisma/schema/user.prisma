@@ -4,23 +4,23 @@ model User {
   // Auth
   email    String  @unique
   username String  @unique
-  googleId String? @unique // google id or firebase uid
-  password String? // hashed password (nullable for social accounts)
-
-  // Contact
-  mobile String?
+  password String // hashed password
+  googleId String? @unique // google id
+  phone    String?
 
   // Profile
-  name      String? @default("Unnamed User")
+  name      String  @default("Unnamed User")
   avatarUrl String? @default("https://www.gravatar.com/avatar/000000000000000000000000000000?d=mp&f=y")
 
+  // Address
+  country String?
+  city    String?
+  state   String?
+  zip     String?
+
   // Settings
-  role              UserRole     @default(USER)
-  status            UserStatus   @default(ACTIVE)
-  isVerified        Boolean      @default(false)
-  timezone          String       @default("UTC") // e.g., "America/New_York"
-  language          UserLanguage @default(EN)
-  allowNotification Boolean      @default(true)
+  role   UserRole   @default(USER)
+  status UserStatus @default(ACTIVE)
 
   // Logout tracking
   isLoggedIn   Boolean   @default(false)
@@ -29,20 +29,23 @@ model User {
   lastActiveAt DateTime?
 
   // OTP
+  isVerified   Boolean   @default(false)
   otp          String? // 4 digit hashed OTP code
   otpExpiresAt DateTime?
   otpType      OtpType?
 
-  // Subscription, based on last successful payment (overwrite previous one)
-  subscriptionStatus SubscriptionStatus? // ensure during successful payment in webhook
-  stripeCustomerId   String?             @unique // ensure during payment intent creation
+  // Stripe
+  stripeCustomerId String? @unique // ensure during first payment intent creation
 
-  currentPlanId String?
-  currentPlan   SubscriptionPlan? @relation(fields: [currentPlanId], references: [id], onDelete: SetNull)
+  // Subscription, based on last successful payment (overwrite previous one)
+  currentPlanId     String?
+  currentPlan       SubscriptionPlan?   @relation(fields: [currentPlanId], references: [id], onDelete: SetNull)
+  currentPlanStatus SubscriptionStatus? // ensure during successful payment in webhook
+
+  userSubscription UserSubscription[]
 
   // Notifications
-  notifications    UserNotification[]
-  userSubscription UserSubscription[]
+  notifications UserNotification[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -53,34 +56,17 @@ model User {
 enum UserRole {
   SUPER_ADMIN
   ADMIN
-  ORGANIZER
+  SELLER
   USER
 }
 
 enum UserStatus {
   ACTIVE
   INACTIVE
-  BANNED
   DELETED
 }
 
 enum OtpType {
-  REGISTER // for register (one time per user)
-  LOGIN
+  VERIFICATION // for email verification
   RESET //for reset password
-  PHONE //for adding phone
-}
-
-enum UserLanguage {
-  EN
-  ES
-  DE
-  FR
-  IT
-  JA
-  KO
-  NL
-  PT
-  RU
-  ZH
 }

@@ -47,7 +47,7 @@ model UserSubscription {
   planStartedAt DateTime @default(now())
   planEndedAt   DateTime // calculated based on billing period
 
-  paidAt DateTime?
+  paidAt   DateTime?
   failedAt DateTime?
 
   createdAt DateTime @default(now())
