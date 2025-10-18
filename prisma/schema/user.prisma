@@ -19,7 +19,7 @@ model User {
   zip     String?
 
   // Settings
-  role   UserRole   @default(USER)
+  role   UserRole   @default(SELLER)
   status UserStatus @default(ACTIVE)
 
   // Logout tracking
@@ -58,7 +58,6 @@ enum UserRole {
   SUPER_ADMIN
   ADMIN
   SELLER
-  USER
 }
 
 enum UserStatus {

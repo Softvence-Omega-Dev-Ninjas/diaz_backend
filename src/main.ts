@@ -21,12 +21,6 @@ async function bootstrap() {
       'http://localhost:3002',
       'http://localhost:5173',
       'http://localhost:5174',
-      'http://localhost:5175',
-      'http://localhost:5176',
-      'http://localhost:5177',
-      'http://localhost:5178',
-      'http://localhost:5179',
-      'http://localhost:5180',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
@@ -43,8 +37,8 @@ async function bootstrap() {
 
   // Swagger config with Bearer Auth
   const config = new DocumentBuilder()
-    .setTitle('Elad Giserman API')
-    .setDescription('The Elad Giserman API description')
+    .setTitle('Diaz API')
+    .setDescription('The Diaz API description')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
@@ -58,7 +52,7 @@ async function bootstrap() {
     bodyParser.raw({ type: 'application/json' }),
   );
 
-  const port = parseInt(configService.get<string>(ENVEnum.PORT) ?? '5050', 10);
+  const port = parseInt(configService.get<string>(ENVEnum.PORT) ?? '5051', 10);
   await app.listen(port);
 }
 
