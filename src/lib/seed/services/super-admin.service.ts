@@ -1,12 +1,13 @@
 import { ENVEnum } from '@/common/enum/env.enum';
 import { PrismaService } from '@/lib/prisma/prisma.service';
 import { UtilsService } from '@/lib/utils/utils.service';
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import chalk from 'chalk';
 
 @Injectable()
 export class SuperAdminService implements OnModuleInit {
+  private readonly logger = new Logger(SuperAdminService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly utils: UtilsService,
@@ -43,10 +44,8 @@ export class SuperAdminService implements OnModuleInit {
           isVerified: true,
         },
       });
-      console.info(
-        chalk.bgGreen.white.bold(
-          `🚀 Super Admin user created with email: ${superAdminEmail}`,
-        ),
+      this.logger.log(
+        `[CREATE] Super Admin user created with email: ${superAdminEmail}`,
       );
       return;
     }
@@ -61,10 +60,9 @@ export class SuperAdminService implements OnModuleInit {
         role: 'SUPER_ADMIN',
       },
     });
-    console.info(
-      chalk.bgGreen.white.bold(
-        `🚀 Super Admin user exists with email: ${superAdminEmail}`,
-      ),
+
+    this.logger.log(
+      `[UPDATE] Super Admin user updated with email: ${superAdminEmail}`,
     );
   }
 }

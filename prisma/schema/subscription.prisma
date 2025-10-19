@@ -8,7 +8,8 @@ model SubscriptionPlan {
   picLimit    Int      @default(5)
   wordLimit   Int      @default(500)
 
-  isBest Boolean @default(false)
+  isBest   Boolean @default(false)
+  isActive Boolean @default(true)
 
   stripeProductId String @unique
   stripePriceId   String @unique
@@ -81,6 +82,8 @@ enum SubscriptionStatus {
 /// Promo codes table
 model PromoCode {
   id String @id @default(uuid())
+
+  stripeCouponId String @unique
 
   code           String    @unique
   discount       Float? // Percentage discount

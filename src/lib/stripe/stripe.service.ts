@@ -1,8 +1,8 @@
 import { ENVEnum } from '@/common/enum/env.enum';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { PlanType } from '@prisma/client';
 import Stripe from 'stripe';
-import { StripePaymentMetadata } from './stripe.types';
 
 @Injectable()
 export class StripeService {
@@ -21,138 +21,87 @@ export class StripeService {
     title,
     description,
     price,
-    currency = 'usd',
-    interval = 'month',
+    planType,
   }: {
     title: string;
-    description?: string;
+    description: string;
     price: number;
-    currency?: string;
-    interval?: 'month' | 'year';
+    planType: PlanType;
   }) {
     const product = await this.stripe.products.create({
       name: title,
       description,
     });
 
+    const lookupKey = this.generateLookUpKey(planType);
+
     const stripePrice = await this.stripe.prices.create({
       product: product.id,
-      unit_amount: Math.round(price * 100), // convert to cents
-      currency,
-      recurring: { interval },
+      unit_amount: Math.round(price * 100),
+      currency: 'usd',
+      recurring: { interval: 'month' },
+      lookup_key: lookupKey, // important for lookup
     });
 
     this.logger.log(
-      `Created Stripe product ${product.id} with price ${stripePrice.id}`,
+      `Created Stripe product ${product.id} with price ${stripePrice.id} and lookup_key ${lookupKey}`,
     );
 
     return { product, stripePrice };
   }
 
-  async updatePrice({
-    productId,
-    newPrice,
-    currency = 'usd',
-    interval = 'month',
-  }: {
-    productId: string;
-    newPrice: number;
-    currency?: string;
-    interval?: 'month' | 'year';
-  }) {
-    const stripePrice = await this.stripe.prices.create({
-      product: productId,
-      unit_amount: Math.round(newPrice * 100),
-      currency,
-      recurring: { interval },
-    });
+  async getActivePriceByPlanType(planType: PlanType) {
+    const lookupKey = this.generateLookUpKey(planType);
 
-    this.logger.log(
-      `Created new price ${stripePrice.id} for product ${productId}`,
-    );
-
-    return stripePrice;
-  }
-
-  async deleteProduct(productId: string) {
-    // Step 1: Mark the product inactive
-    const deletedProduct = await this.stripe.products.update(productId, {
-      active: false,
-    });
-    this.logger.log(`Product ${productId} marked inactive`);
-
-    // Step 2: Fetch all related prices
     const prices = await this.stripe.prices.list({
-      product: productId,
+      lookup_keys: [lookupKey],
       active: true,
+      limit: 1,
     });
 
-    // Step 3: Deactivate all associated prices
-    for (const price of prices.data) {
-      await this.stripe.prices.update(price.id, { active: false });
-      this.logger.log(`Price ${price.id} marked inactive`);
+    if (prices.data.length === 0) {
+      this.logger.log(`No Stripe price found for plan type ${planType}`);
+      return null;
     }
 
-    return deletedProduct;
-  }
-
-  // Payment Intent Management
-  async retrievePaymentIntent(paymentIntentId: string) {
-    const pi = await this.stripe.paymentIntents.retrieve(paymentIntentId);
-    this.logger.log(`Retrieved PaymentIntent ${paymentIntentId}`);
-    return pi;
-  }
-
-  // Payment Intent (for one-time payments)
-  async createPaymentIntent({
-    amount,
-    currency,
-    customerId,
-    metadata,
-  }: {
-    amount: number;
-    currency: string;
-    customerId: string;
-    metadata: StripePaymentMetadata;
-  }) {
-    const intent = await this.stripe.paymentIntents.create(
-      {
-        amount,
-        currency,
-        customer: customerId,
-        receipt_email: metadata.email,
-        automatic_payment_methods: {
-          enabled: true,
-          allow_redirects: 'never',
-        },
-        metadata,
-      },
-      {
-        idempotencyKey: `pi_${metadata.userId}_${metadata.planId}`,
-      },
+    this.logger.log(
+      `Found Stripe price ${prices.data[0].id} for plan type ${planType}`,
     );
 
-    this.logger.log(`Created payment intent ${intent.id}`);
-    return intent;
+    return prices.data[0] ?? null;
   }
 
-  // Customer Management
-  async createCustomer({
-    email,
-    name,
-    metadata,
-  }: {
-    email: string;
-    name?: string;
-    metadata?: Record<string, string>;
-  }) {
-    const customer = await this.stripe.customers.create({
-      email,
-      name,
-      metadata,
+  // Coupons management
+  async createStripeCoupon(
+    discount: number,
+    planType: PlanType,
+    duration: 'forever' | 'repeating' | 'once' = 'forever',
+  ) {
+    const couponId = this.generateCouponId(planType);
+    return await this.stripe.coupons.create({
+      id: couponId,
+      percent_off: discount,
+      duration,
     });
-    this.logger.log(`Created Stripe customer ${customer.id}`);
-    return customer;
+  }
+
+  async getCouponByPlanType(planType: PlanType) {
+    const couponId = this.generateCouponId(planType);
+
+    try {
+      const coupon = await this.stripe.coupons.retrieve(couponId);
+
+      this.logger.log(
+        `Retrieved Stripe coupon ${coupon.id} for plan type ${planType}`,
+      );
+
+      return coupon;
+    } catch (error) {
+      this.logger.error(
+        `Error retrieving Stripe coupon for plan type ${planType}: ${error}`,
+      );
+      return null;
+    }
   }
 
   // Webhook Utility
@@ -170,5 +119,13 @@ export class StripeService {
       this.logger.error('Invalid webhook signature', err);
       throw new Error('Invalid webhook signature');
     }
+  }
+
+  public generateLookUpKey(planType: PlanType) {
+    return `subscription:${planType.toLowerCase()}:usd:month`;
+  }
+
+  public generateCouponId(planType: PlanType) {
+    return `coupon_${planType.toLowerCase()}`;
   }
 }
