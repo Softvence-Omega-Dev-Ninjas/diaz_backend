@@ -7,8 +7,8 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies for build (if needed)
-RUN apt-get update && apt-get install -y openssl
+# Install system dependencies for build
+RUN apt update && apt install -y openssl
 
 # Copy package, lock file & prisma folder
 COPY package.json pnpm-lock.yaml ./
@@ -34,7 +34,7 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app
 
 # Install system dependencies needed at runtime
-RUN apt-get update && apt-get install -y openssl
+RUN apt update && apt install -y openssl curl
 
 # Copy only necessary files from builder stage
 COPY --from=builder /app/package.json ./package.json

@@ -1,35 +1,47 @@
 services:
+  caddy:
+    image: caddy
+    container_name: caddy
+    restart: always
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      server:
+        condition: service_healthy
+    # healthcheck:
+    #   test: ["CMD", "curl", "-fsS", "http://127.0.0.1/health"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
+
   server:
     platform: linux/amd64
-    image: softvence/diaz_backend_server:latest
-    container_name: diaz_backend_api
+    image: ${DOCKER_USERNAME}/${PACKAGE_NAME}:${PACKAGE_VERSION}
+    container_name: ${PACKAGE_NAME}_api
     restart: always
+    env_file:
+      - .env
     environment:
-      NODE_ENV: 'production'
-      DATABASE_URL: 'postgresql://postgres:postgres@db:5432/diaz_backend_db'
-
-      JWT_SECRET: 'secret'
-      JWT_EXPIRES_IN: 90d
-
-      BASE_URL: 'https://lgcglobalcontractingltd.com/js'
-      PORT: 5051
-
-      MAIL_USER: 'arafatmannan2019@gmail.com'
-      MAIL_PASS: 'eurp zvyi gnoy enag'
+      NODE_ENV: production
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/${PACKAGE_NAME}_db
 
       REDIS_HOST: redis
       REDIS_PORT: 6379
 
-      SUPER_ADMIN_EMAIL: 'sajib.softvence@gmail.com'
-      SUPER_ADMIN_PASS: 'superadmin'
-
-      STRIPE_SECRET_KEY: 'sk_test_51RlFNRQNJ9V9C9o5lWnJ0ZoVAb5almOirTaBvWZZOU74qXTIUaPeCRtnaHjGxts71VkVaK7tJA5JRjfjpKkeXJGo00dt24jNLx'
-      STRIPE_WEBHOOK_SECRET: 'whsec_9Q1CdmnbOBvrajNmXM9n4U0Qz3OHYMUv'
+      BASE_URL: http://0.0.0.0:5051/api
+      PORT: 5051
     ports:
       - '5051:5051'
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     command: >
       sh -c "
         echo '🏁 Waiting for DB...';
@@ -40,28 +52,45 @@ services:
       "
     volumes:
       - files-data:/app/uploads
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://0.0.0.0:5051/api/health']
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   db:
     image: postgres
-    container_name: diaz_backend_db
+    container_name: ${PACKAGE_NAME}_db
     restart: always
     user: postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: diaz_backend_db
+      POSTGRES_DB: ${PACKAGE_NAME}_db
     volumes:
-      - diaz_backend_data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data
     ports:
       - '5433:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis
-    container_name: diaz_backend_redis
+    container_name: ${PACKAGE_NAME}_redis
     restart: always
     ports:
       - '6384:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
-  diaz_backend_data:
+  db_data:
   files-data:
+  caddy_data:
+  caddy_config:
