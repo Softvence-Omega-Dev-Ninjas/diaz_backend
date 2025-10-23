@@ -1,5 +1,5 @@
-api.domain.com {
-  tls internal
+api.floridayachttrader.com {
+  tls internal # TODO: remove this line
   reverse_proxy server:5051
 
   header {
