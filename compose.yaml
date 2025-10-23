@@ -14,7 +14,7 @@ services:
       server:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "caddy validate --config /etc/caddy/Caddyfile"]
+      test: ['CMD-SHELL', 'caddy validate --config /etc/caddy/Caddyfile']
       interval: 30s
       timeout: 5s
       retries: 3
@@ -40,7 +40,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      redis:
+      redis-master:
         condition: service_healthy
     command: >
       sh -c "
@@ -77,20 +77,56 @@ services:
       timeout: 5s
       retries: 5
 
-  redis:
+  redis-master:
     image: redis
-    container_name: ${PACKAGE_NAME}_redis
-    restart: always
+    container_name: ${PACKAGE_NAME}_redis-master
+    command:
+      [
+        'redis-server',
+        '--appendonly',
+        'yes',
+        '--bind',
+        '0.0.0.0',
+        '--protected-mode',
+        'no',
+      ]
     ports:
-      - '6384:6379'
+      - '22376:6379'
     healthcheck:
       test: ['CMD', 'redis-cli', 'ping']
-      interval: 10s
-      timeout: 5s
+      interval: 5s
+      timeout: 3s
       retries: 5
+    restart: always
+
+  redis-replica:
+    image: redis
+    container_name: ${PACKAGE_NAME}_redis-replica
+    command:
+      [
+        'redis-server',
+        '--replicaof',
+        'redis-master',
+        '6379',
+        '--bind',
+        '0.0.0.0',
+        '--protected-mode',
+        'no',
+      ]
+    ports:
+      - '22377:6379'
+    depends_on:
+      - redis-master
+    restart: always
 
 volumes:
   db_data:
   files-data:
   caddy_data:
   caddy_config:
+
+networks:
+  default:
+    name: ${PACKAGE_NAME}_network
+    labels:
+      - 'project=${PACKAGE_NAME}'
