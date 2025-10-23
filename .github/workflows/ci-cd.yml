@@ -99,6 +99,6 @@ jobs:
           key: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
           script: |
             cd ~/server
-            docker compose pull
+            docker compose ${{ secrets.DOCKER_USERNAME }}/${{ secrets.PACKAGE_NAME }}:${{ secrets.PACKAGE_VERSION }}
             docker compose up -d --remove-orphans
-            docker system prune -f
+            docker system prune -a -f
