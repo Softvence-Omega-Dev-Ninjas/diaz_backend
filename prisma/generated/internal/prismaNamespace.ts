@@ -422,6 +422,7 @@ export const ModelName = {
   FileInstance: 'FileInstance',
   Notification: 'Notification',
   UserNotification: 'UserNotification',
+  PageBanner: 'PageBanner',
   SubscriptionPlan: 'SubscriptionPlan',
   UserSubscription: 'UserSubscription',
   PromoCode: 'PromoCode',
@@ -459,6 +460,7 @@ export type TypeMap<
       | 'fileInstance'
       | 'notification'
       | 'userNotification'
+      | 'pageBanner'
       | 'subscriptionPlan'
       | 'userSubscription'
       | 'promoCode'
@@ -1227,6 +1229,82 @@ export type TypeMap<
         };
       };
     };
+    PageBanner: {
+      payload: Prisma.$PageBannerPayload<ExtArgs>;
+      fields: Prisma.PageBannerFieldRefs;
+      operations: {
+        findUnique: {
+          args: Prisma.PageBannerFindUniqueArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PageBannerPayload> | null;
+        };
+        findUniqueOrThrow: {
+          args: Prisma.PageBannerFindUniqueOrThrowArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PageBannerPayload>;
+        };
+        findFirst: {
+          args: Prisma.PageBannerFindFirstArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PageBannerPayload> | null;
+        };
+        findFirstOrThrow: {
+          args: Prisma.PageBannerFindFirstOrThrowArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PageBannerPayload>;
+        };
+        findMany: {
+          args: Prisma.PageBannerFindManyArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PageBannerPayload>[];
+        };
+        create: {
+          args: Prisma.PageBannerCreateArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PageBannerPayload>;
+        };
+        createMany: {
+          args: Prisma.PageBannerCreateManyArgs<ExtArgs>;
+          result: BatchPayload;
+        };
+        createManyAndReturn: {
+          args: Prisma.PageBannerCreateManyAndReturnArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PageBannerPayload>[];
+        };
+        delete: {
+          args: Prisma.PageBannerDeleteArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PageBannerPayload>;
+        };
+        update: {
+          args: Prisma.PageBannerUpdateArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PageBannerPayload>;
+        };
+        deleteMany: {
+          args: Prisma.PageBannerDeleteManyArgs<ExtArgs>;
+          result: BatchPayload;
+        };
+        updateMany: {
+          args: Prisma.PageBannerUpdateManyArgs<ExtArgs>;
+          result: BatchPayload;
+        };
+        updateManyAndReturn: {
+          args: Prisma.PageBannerUpdateManyAndReturnArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PageBannerPayload>[];
+        };
+        upsert: {
+          args: Prisma.PageBannerUpsertArgs<ExtArgs>;
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PageBannerPayload>;
+        };
+        aggregate: {
+          args: Prisma.PageBannerAggregateArgs<ExtArgs>;
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePageBanner>;
+        };
+        groupBy: {
+          args: Prisma.PageBannerGroupByArgs<ExtArgs>;
+          result: runtime.Types.Utils.Optional<Prisma.PageBannerGroupByOutputType>[];
+        };
+        count: {
+          args: Prisma.PageBannerCountArgs<ExtArgs>;
+          result:
+            | runtime.Types.Utils.Optional<Prisma.PageBannerCountAggregateOutputType>
+            | number;
+        };
+      };
+    };
     SubscriptionPlan: {
       payload: Prisma.$SubscriptionPlanPayload<ExtArgs>;
       fields: Prisma.SubscriptionPlanFieldRefs;
@@ -1813,6 +1891,21 @@ export const UserNotificationScalarFieldEnum = {
 export type UserNotificationScalarFieldEnum =
   (typeof UserNotificationScalarFieldEnum)[keyof typeof UserNotificationScalarFieldEnum];
 
+export const PageBannerScalarFieldEnum = {
+  id: 'id',
+  page: 'page',
+  site: 'site',
+  bannerTitle: 'bannerTitle',
+  subtitle: 'subtitle',
+  logoId: 'logoId',
+  backgroundId: 'backgroundId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+} as const;
+
+export type PageBannerScalarFieldEnum =
+  (typeof PageBannerScalarFieldEnum)[keyof typeof PageBannerScalarFieldEnum];
+
 export const SubscriptionPlanScalarFieldEnum = {
   id: 'id',
   title: 'title',
@@ -2173,6 +2266,38 @@ export type ListEnumFileTypeFieldRefInput<$PrismaModel> = FieldRefInputType<
 >;
 
 /**
+ * Reference to a field of type 'PageType'
+ */
+export type EnumPageTypeFieldRefInput<$PrismaModel> = FieldRefInputType<
+  $PrismaModel,
+  'PageType'
+>;
+
+/**
+ * Reference to a field of type 'PageType[]'
+ */
+export type ListEnumPageTypeFieldRefInput<$PrismaModel> = FieldRefInputType<
+  $PrismaModel,
+  'PageType[]'
+>;
+
+/**
+ * Reference to a field of type 'SiteType'
+ */
+export type EnumSiteTypeFieldRefInput<$PrismaModel> = FieldRefInputType<
+  $PrismaModel,
+  'SiteType'
+>;
+
+/**
+ * Reference to a field of type 'SiteType[]'
+ */
+export type ListEnumSiteTypeFieldRefInput<$PrismaModel> = FieldRefInputType<
+  $PrismaModel,
+  'SiteType[]'
+>;
+
+/**
  * Reference to a field of type 'PlanType'
  */
 export type EnumPlanTypeFieldRefInput<$PrismaModel> = FieldRefInputType<
@@ -2359,6 +2484,7 @@ export type GlobalOmitConfig = {
   fileInstance?: Prisma.FileInstanceOmit;
   notification?: Prisma.NotificationOmit;
   userNotification?: Prisma.UserNotificationOmit;
+  pageBanner?: Prisma.PageBannerOmit;
   subscriptionPlan?: Prisma.SubscriptionPlanOmit;
   userSubscription?: Prisma.UserSubscriptionOmit;
   promoCode?: Prisma.PromoCodeOmit;

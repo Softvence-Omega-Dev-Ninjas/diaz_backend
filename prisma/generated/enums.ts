@@ -88,6 +88,24 @@ export const FileType = {
 
 export type FileType = (typeof FileType)[keyof typeof FileType];
 
+export const PageType = {
+  HOME: 'HOME',
+  BLOG: 'BLOG',
+  CONTACT: 'CONTACT',
+  SEARCH: 'SEARCH',
+  PRIVACY_POLICY: 'PRIVACY_POLICY',
+  TERMS_AND_CONDITION: 'TERMS_AND_CONDITION',
+} as const;
+
+export type PageType = (typeof PageType)[keyof typeof PageType];
+
+export const SiteType = {
+  FLORIDA: 'FLORIDA',
+  JUPITER: 'JUPITER',
+} as const;
+
+export type SiteType = (typeof SiteType)[keyof typeof SiteType];
+
 export const PlanType = {
   GOLD: 'GOLD',
   PLATINUM: 'PLATINUM',

@@ -17,6 +17,7 @@ export type * from './models/FloridaLead';
 export type * from './models/FileInstance';
 export type * from './models/Notification';
 export type * from './models/UserNotification';
+export type * from './models/PageBanner';
 export type * from './models/SubscriptionPlan';
 export type * from './models/UserSubscription';
 export type * from './models/PromoCode';

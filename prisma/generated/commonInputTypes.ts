@@ -618,6 +618,52 @@ export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
   _max?: Prisma.NestedJsonFilter<$PrismaModel>;
 };
 
+export type EnumPageTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.PageType | Prisma.EnumPageTypeFieldRefInput<$PrismaModel>;
+  in?: $Enums.PageType[] | Prisma.ListEnumPageTypeFieldRefInput<$PrismaModel>;
+  notIn?:
+    | $Enums.PageType[]
+    | Prisma.ListEnumPageTypeFieldRefInput<$PrismaModel>;
+  not?: Prisma.NestedEnumPageTypeFilter<$PrismaModel> | $Enums.PageType;
+};
+
+export type EnumSiteTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.SiteType | Prisma.EnumSiteTypeFieldRefInput<$PrismaModel>;
+  in?: $Enums.SiteType[] | Prisma.ListEnumSiteTypeFieldRefInput<$PrismaModel>;
+  notIn?:
+    | $Enums.SiteType[]
+    | Prisma.ListEnumSiteTypeFieldRefInput<$PrismaModel>;
+  not?: Prisma.NestedEnumSiteTypeFilter<$PrismaModel> | $Enums.SiteType;
+};
+
+export type EnumPageTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PageType | Prisma.EnumPageTypeFieldRefInput<$PrismaModel>;
+  in?: $Enums.PageType[] | Prisma.ListEnumPageTypeFieldRefInput<$PrismaModel>;
+  notIn?:
+    | $Enums.PageType[]
+    | Prisma.ListEnumPageTypeFieldRefInput<$PrismaModel>;
+  not?:
+    | Prisma.NestedEnumPageTypeWithAggregatesFilter<$PrismaModel>
+    | $Enums.PageType;
+  _count?: Prisma.NestedIntFilter<$PrismaModel>;
+  _min?: Prisma.NestedEnumPageTypeFilter<$PrismaModel>;
+  _max?: Prisma.NestedEnumPageTypeFilter<$PrismaModel>;
+};
+
+export type EnumSiteTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SiteType | Prisma.EnumSiteTypeFieldRefInput<$PrismaModel>;
+  in?: $Enums.SiteType[] | Prisma.ListEnumSiteTypeFieldRefInput<$PrismaModel>;
+  notIn?:
+    | $Enums.SiteType[]
+    | Prisma.ListEnumSiteTypeFieldRefInput<$PrismaModel>;
+  not?:
+    | Prisma.NestedEnumSiteTypeWithAggregatesFilter<$PrismaModel>
+    | $Enums.SiteType;
+  _count?: Prisma.NestedIntFilter<$PrismaModel>;
+  _min?: Prisma.NestedEnumSiteTypeFilter<$PrismaModel>;
+  _max?: Prisma.NestedEnumSiteTypeFilter<$PrismaModel>;
+};
+
 export type EnumPlanTypeFilter<$PrismaModel = never> = {
   equals?: $Enums.PlanType | Prisma.EnumPlanTypeFieldRefInput<$PrismaModel>;
   in?: $Enums.PlanType[] | Prisma.ListEnumPlanTypeFieldRefInput<$PrismaModel>;
@@ -1469,6 +1515,52 @@ export type NestedJsonFilterBase<$PrismaModel = never> = {
     | runtime.InputJsonValue
     | Prisma.JsonFieldRefInput<$PrismaModel>
     | Prisma.JsonNullValueFilter;
+};
+
+export type NestedEnumPageTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.PageType | Prisma.EnumPageTypeFieldRefInput<$PrismaModel>;
+  in?: $Enums.PageType[] | Prisma.ListEnumPageTypeFieldRefInput<$PrismaModel>;
+  notIn?:
+    | $Enums.PageType[]
+    | Prisma.ListEnumPageTypeFieldRefInput<$PrismaModel>;
+  not?: Prisma.NestedEnumPageTypeFilter<$PrismaModel> | $Enums.PageType;
+};
+
+export type NestedEnumSiteTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.SiteType | Prisma.EnumSiteTypeFieldRefInput<$PrismaModel>;
+  in?: $Enums.SiteType[] | Prisma.ListEnumSiteTypeFieldRefInput<$PrismaModel>;
+  notIn?:
+    | $Enums.SiteType[]
+    | Prisma.ListEnumSiteTypeFieldRefInput<$PrismaModel>;
+  not?: Prisma.NestedEnumSiteTypeFilter<$PrismaModel> | $Enums.SiteType;
+};
+
+export type NestedEnumPageTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PageType | Prisma.EnumPageTypeFieldRefInput<$PrismaModel>;
+  in?: $Enums.PageType[] | Prisma.ListEnumPageTypeFieldRefInput<$PrismaModel>;
+  notIn?:
+    | $Enums.PageType[]
+    | Prisma.ListEnumPageTypeFieldRefInput<$PrismaModel>;
+  not?:
+    | Prisma.NestedEnumPageTypeWithAggregatesFilter<$PrismaModel>
+    | $Enums.PageType;
+  _count?: Prisma.NestedIntFilter<$PrismaModel>;
+  _min?: Prisma.NestedEnumPageTypeFilter<$PrismaModel>;
+  _max?: Prisma.NestedEnumPageTypeFilter<$PrismaModel>;
+};
+
+export type NestedEnumSiteTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.SiteType | Prisma.EnumSiteTypeFieldRefInput<$PrismaModel>;
+  in?: $Enums.SiteType[] | Prisma.ListEnumSiteTypeFieldRefInput<$PrismaModel>;
+  notIn?:
+    | $Enums.SiteType[]
+    | Prisma.ListEnumSiteTypeFieldRefInput<$PrismaModel>;
+  not?:
+    | Prisma.NestedEnumSiteTypeWithAggregatesFilter<$PrismaModel>
+    | $Enums.SiteType;
+  _count?: Prisma.NestedIntFilter<$PrismaModel>;
+  _min?: Prisma.NestedEnumSiteTypeFilter<$PrismaModel>;
+  _max?: Prisma.NestedEnumSiteTypeFilter<$PrismaModel>;
 };
 
 export type NestedEnumPlanTypeFilter<$PrismaModel = never> = {

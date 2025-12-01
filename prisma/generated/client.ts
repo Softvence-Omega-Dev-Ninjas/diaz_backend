@@ -93,6 +93,11 @@ export type Notification = Prisma.NotificationModel;
  */
 export type UserNotification = Prisma.UserNotificationModel;
 /**
+ * Model PageBanner
+ *
+ */
+export type PageBanner = Prisma.PageBannerModel;
+/**
  * Model SubscriptionPlan
  *
  */

@@ -13,6 +13,8 @@ model FileInstance {
   updatedAt DateTime @default(now()) @updatedAt
 
   boatImages BoatImage[]
+  pageBanners PageBanner[] @relation("LogoFile")
+  pageBannersBackground PageBanner[] @relation("BackgroundFile")
 
   @@map("file_instances")
 }
