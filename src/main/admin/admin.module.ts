@@ -1,12 +1,10 @@
 import { Module } from '@nestjs/common';
-import { AISearchBannerModule } from './aisearchbanner/aisearchbanner.module';
 import { BoatsModule } from './boats/boats.module';
 import { BlogModule } from './content/blog/blog.module';
 import { DashboardModule } from './dashboard/dashboard.module';
-import { FeaturedBrandsModule } from './featuredbrands/featured-brands.module';
 import { ListingManagementModule } from './listing-management/listing-management.module';
-import { PackageBannerModule } from './packagebanner/packagebanner.module';
 import { BannerModule } from './pagebanner/banner.module';
+import { PopularCategoryModule } from './popular_catagory/popular_catagory.module';
 import { PrivacyPolicyModule } from './privacy-policy/privacy-policy.module';
 import { SellerManagementModule } from './seller-management/seller-management.module';
 import { SettingsModule } from './settings/settings.module';
@@ -25,9 +23,7 @@ import { UserPermissionsModule } from './users-permissions/user-permissions.modu
     DashboardModule,
     ListingManagementModule,
     SettingsModule,
-    FeaturedBrandsModule,
-    PackageBannerModule,
-    AISearchBannerModule,
+    PopularCategoryModule,
   ],
 })
 export class AdminModule {}
