@@ -14,7 +14,9 @@
       const socket = io('http://localhost:5051', { path: '/ws' });
 
       // simulate page slug
-      socket.emit('visit:start', { page: '/product/yacht-23' });
+      socket.emit('visit:start', {
+        page: 'https://api.floridayachttrader.com/api/boats/41ad11d6-016d-4939-baed-d5ed37de56a6/details',
+      });
 
       socket.on('visitors:count', (data) => {
         document.getElementById('active').innerText = data.active;

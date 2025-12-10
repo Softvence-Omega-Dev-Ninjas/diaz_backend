@@ -6,7 +6,7 @@ export class TopViewedBoatsService {
   constructor(private readonly prisma: PrismaService) {}
 
   private async getBoatPageViews(boatId: string): Promise<number> {
-    const page = `/search-listing/${boatId}`;
+    const page = `/boats/${boatId}/details`;
 
     const result = await this.prisma.client.pageView.aggregate({
       _sum: { count: true },
