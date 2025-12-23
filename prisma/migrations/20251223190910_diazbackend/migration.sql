@@ -1,4 +1,13 @@
 -- CreateEnum
+CREATE TYPE "PageType" AS ENUM ('HOME', 'BLOG', 'CONTACT', 'SEARCH', 'PRIVACY_POLICY', 'TERMS_AND_CONDITION');
+
+-- CreateEnum
+CREATE TYPE "SiteType" AS ENUM ('FLORIDA', 'JUPITER');
+
+-- CreateEnum
+CREATE TYPE "PostStatus" AS ENUM ('DRAFT', 'PUBLISHED', 'ARCHIVED');
+
+-- CreateEnum
 CREATE TYPE "BoatSpecificationType" AS ENUM ('MAKE', 'MODEL', 'ENGINE_TYPE', 'FUEL_TYPE', 'CLASS', 'MATERIAL', 'CONDITION', 'PROP_TYPE', 'PROP_MATERIAL');
 
 -- CreateEnum
@@ -23,15 +32,6 @@ CREATE TYPE "ContactType" AS ENUM ('INDIVIDUAL_LISTING', 'GLOBAL');
 CREATE TYPE "FileType" AS ENUM ('image', 'docs', 'link', 'document', 'any', 'video', 'audio');
 
 -- CreateEnum
-CREATE TYPE "PageType" AS ENUM ('HOME', 'BLOG', 'CONTACT', 'SEARCH', 'PRIVACY_POLICY', 'TERMS_AND_CONDITION');
-
--- CreateEnum
-CREATE TYPE "SiteType" AS ENUM ('FLORIDA', 'JUPITER');
-
--- CreateEnum
-CREATE TYPE "PostStatus" AS ENUM ('DRAFT', 'PUBLISHED', 'ARCHIVED');
-
--- CreateEnum
 CREATE TYPE "Currency" AS ENUM ('AED', 'AFN', 'ALL', 'AMD', 'ANG', 'AOA', 'ARS', 'AUD', 'AWG', 'AZN', 'BAM', 'BBD', 'BDT', 'BGN', 'BHD', 'BIF', 'BMD', 'BND', 'BOB', 'BRL', 'BSD', 'BTN', 'BWP', 'BYN', 'BZD', 'CAD', 'CDF', 'CHF', 'CLP', 'CNY', 'COP', 'CRC', 'CUP', 'CVE', 'CZK', 'DJF', 'DKK', 'DOP', 'DZD', 'EGP', 'ERN', 'ETB', 'EUR', 'FJD', 'FKP', 'FOK', 'GBP', 'GEL', 'GGP', 'GHS', 'GIP', 'GMD', 'GNF', 'GTQ', 'GYD', 'HKD', 'HNL', 'HRK', 'HTG', 'HUF', 'IDR', 'ILS', 'IMP', 'INR', 'IQD', 'IRR', 'ISK', 'JEP', 'JMD', 'JOD', 'JPY', 'KES', 'KGS', 'KHR', 'KID', 'KMF', 'KRW', 'KWD', 'KYD', 'KZT', 'LAK', 'LBP', 'LKR', 'LRD', 'LSL', 'LYD', 'MAD', 'MDL', 'MGA', 'MKD', 'MMK', 'MNT', 'MOP', 'MRU', 'MUR', 'MVR', 'MWK', 'MXN', 'MYR', 'MZN', 'NAD', 'NGN', 'NIO', 'NOK', 'NPR', 'NZD', 'OMR', 'PAB', 'PEN', 'PGK', 'PHP', 'PKR', 'PLN', 'PYG', 'QAR', 'RON', 'RSD', 'RUB', 'RWF', 'SAR', 'SBD', 'SCR', 'SDG', 'SEK', 'SGD', 'SHP', 'SLE', 'SLL', 'SOS', 'SRD', 'SSP', 'STN', 'SYP', 'SZL', 'THB', 'TJS', 'TMT', 'TND', 'TOP', 'TRY', 'TTD', 'TVD', 'TWD', 'TZS', 'UAH', 'UGX', 'USD', 'UYU', 'UZS', 'VES', 'VND', 'VUV', 'WST', 'XAF', 'XCD', 'XDR', 'XOF', 'XPF', 'YER', 'ZAR', 'ZMW', 'ZWL');
 
 -- CreateEnum
@@ -51,6 +51,48 @@ CREATE TYPE "UserStatus" AS ENUM ('ACTIVE', 'INACTIVE', 'DELETED');
 
 -- CreateEnum
 CREATE TYPE "OtpType" AS ENUM ('VERIFICATION', 'RESET');
+
+-- CreateTable
+CREATE TABLE "ai_search_banners" (
+    "id" TEXT NOT NULL,
+    "site" "SiteType" NOT NULL DEFAULT 'JUPITER',
+    "bannerTitle" TEXT NOT NULL,
+    "subtitle" TEXT,
+    "aiSearchBannerId" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ai_search_banners_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "page_banners" (
+    "id" TEXT NOT NULL,
+    "page" "PageType" NOT NULL,
+    "site" "SiteType" NOT NULL,
+    "bannerTitle" TEXT NOT NULL,
+    "subtitle" TEXT,
+    "backgroundId" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "page_banners_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "blog" (
+    "id" TEXT NOT NULL,
+    "blogImageId" TEXT,
+    "blogTitle" VARCHAR(255) NOT NULL,
+    "blogDescription" TEXT NOT NULL,
+    "sharedLink" VARCHAR(255) NOT NULL,
+    "readTime" INTEGER DEFAULT 5,
+    "postStatus" "PostStatus" NOT NULL DEFAULT 'DRAFT',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "blog_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "boat_specifications" (
@@ -179,47 +221,6 @@ CREATE TABLE "florida_leads" (
 );
 
 -- CreateTable
-CREATE TABLE "file_instances" (
-    "id" TEXT NOT NULL,
-    "filename" TEXT NOT NULL,
-    "originalFilename" TEXT NOT NULL,
-    "path" TEXT NOT NULL,
-    "url" TEXT NOT NULL,
-    "fileType" "FileType" NOT NULL DEFAULT 'any',
-    "mimeType" TEXT NOT NULL,
-    "size" INTEGER NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "file_instances_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "notifications" (
-    "id" TEXT NOT NULL,
-    "type" TEXT NOT NULL,
-    "title" TEXT NOT NULL,
-    "message" TEXT NOT NULL,
-    "meta" JSONB NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "notifications_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "user_notifications" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "notificationId" TEXT NOT NULL,
-    "read" BOOLEAN NOT NULL DEFAULT false,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "user_notifications_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "aboutpage" (
     "id" TEXT NOT NULL,
     "aboutTopImageId" TEXT,
@@ -266,33 +267,68 @@ CREATE TABLE "terms_of_services" (
 );
 
 -- CreateTable
-CREATE TABLE "page_banners" (
+CREATE TABLE "featured_brands" (
     "id" TEXT NOT NULL,
-    "page" "PageType" NOT NULL,
+    "featuredbrandId" TEXT,
     "site" "SiteType" NOT NULL,
-    "bannerTitle" TEXT NOT NULL,
-    "subtitle" TEXT,
-    "logoId" TEXT,
-    "backgroundId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "page_banners_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "featured_brands_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "blog" (
+CREATE TABLE "file_instances" (
     "id" TEXT NOT NULL,
-    "blogImageId" TEXT,
-    "blogTitle" VARCHAR(255) NOT NULL,
-    "blogDescription" TEXT NOT NULL,
-    "sharedLink" VARCHAR(255) NOT NULL,
-    "readTime" INTEGER DEFAULT 5,
-    "postStatus" "PostStatus" NOT NULL DEFAULT 'DRAFT',
+    "filename" TEXT NOT NULL,
+    "originalFilename" TEXT NOT NULL,
+    "path" TEXT NOT NULL,
+    "url" TEXT NOT NULL,
+    "fileType" "FileType" NOT NULL DEFAULT 'any',
+    "mimeType" TEXT NOT NULL,
+    "size" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "file_instances_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "notifications" (
+    "id" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "message" TEXT NOT NULL,
+    "meta" JSONB NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "notifications_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "user_notifications" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "notificationId" TEXT NOT NULL,
+    "read" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "user_notifications_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "package_banners" (
+    "id" TEXT NOT NULL,
+    "site" "SiteType" NOT NULL DEFAULT 'FLORIDA',
+    "bannerTitle" TEXT NOT NULL,
+    "subtitle" TEXT,
+    "packageBannerId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "blog_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "package_banners_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -453,6 +489,9 @@ CREATE TABLE "_blogImage" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "blog_sharedLink_key" ON "blog"("sharedLink");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "boat_specifications_type_name_key" ON "boat_specifications"("type", "name");
 
 -- CreateIndex
@@ -460,9 +499,6 @@ CREATE UNIQUE INDEX "boat_features_type_name_key" ON "boat_features"("type", "na
 
 -- CreateIndex
 CREATE UNIQUE INDEX "boats_listingId_key" ON "boats"("listingId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "user_notifications_userId_notificationId_key" ON "user_notifications"("userId", "notificationId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "aboutpage_aboutTopImageId_key" ON "aboutpage"("aboutTopImageId");
@@ -477,7 +513,7 @@ CREATE UNIQUE INDEX "contactpage_contactTopImageId_key" ON "contactpage"("contac
 CREATE UNIQUE INDEX "contactpage_contactBottomImageId_key" ON "contactpage"("contactBottomImageId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "blog_sharedLink_key" ON "blog"("sharedLink");
+CREATE UNIQUE INDEX "user_notifications_userId_notificationId_key" ON "user_notifications"("userId", "notificationId");
 
 -- CreateIndex
 CREATE INDEX "visitor_sessions_ip_idx" ON "visitor_sessions"("ip");
@@ -519,6 +555,15 @@ CREATE UNIQUE INDEX "users_stripeCustomerId_key" ON "users"("stripeCustomerId");
 CREATE INDEX "_blogImage_B_index" ON "_blogImage"("B");
 
 -- AddForeignKey
+ALTER TABLE "ai_search_banners" ADD CONSTRAINT "ai_search_banners_aiSearchBannerId_fkey" FOREIGN KEY ("aiSearchBannerId") REFERENCES "file_instances"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "page_banners" ADD CONSTRAINT "page_banners_backgroundId_fkey" FOREIGN KEY ("backgroundId") REFERENCES "file_instances"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "blog" ADD CONSTRAINT "blog_blogImageId_fkey" FOREIGN KEY ("blogImageId") REFERENCES "file_instances"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "boats" ADD CONSTRAINT "boats_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -537,12 +582,6 @@ ALTER TABLE "florida_leads" ADD CONSTRAINT "florida_leads_contactId_fkey" FOREIG
 ALTER TABLE "florida_leads" ADD CONSTRAINT "florida_leads_boatId_fkey" FOREIGN KEY ("boatId") REFERENCES "boats"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "user_notifications" ADD CONSTRAINT "user_notifications_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "user_notifications" ADD CONSTRAINT "user_notifications_notificationId_fkey" FOREIGN KEY ("notificationId") REFERENCES "notifications"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "aboutpage" ADD CONSTRAINT "aboutpage_aboutTopImageId_fkey" FOREIGN KEY ("aboutTopImageId") REFERENCES "file_instances"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -555,13 +594,16 @@ ALTER TABLE "contactpage" ADD CONSTRAINT "contactpage_contactTopImageId_fkey" FO
 ALTER TABLE "contactpage" ADD CONSTRAINT "contactpage_contactBottomImageId_fkey" FOREIGN KEY ("contactBottomImageId") REFERENCES "file_instances"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "page_banners" ADD CONSTRAINT "page_banners_logoId_fkey" FOREIGN KEY ("logoId") REFERENCES "file_instances"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "featured_brands" ADD CONSTRAINT "featured_brands_featuredbrandId_fkey" FOREIGN KEY ("featuredbrandId") REFERENCES "file_instances"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "page_banners" ADD CONSTRAINT "page_banners_backgroundId_fkey" FOREIGN KEY ("backgroundId") REFERENCES "file_instances"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "user_notifications" ADD CONSTRAINT "user_notifications_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "blog" ADD CONSTRAINT "blog_blogImageId_fkey" FOREIGN KEY ("blogImageId") REFERENCES "file_instances"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "user_notifications" ADD CONSTRAINT "user_notifications_notificationId_fkey" FOREIGN KEY ("notificationId") REFERENCES "notifications"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "package_banners" ADD CONSTRAINT "package_banners_packageBannerId_fkey" FOREIGN KEY ("packageBannerId") REFERENCES "file_instances"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "settings" ADD CONSTRAINT "settings_logoId_fkey" FOREIGN KEY ("logoId") REFERENCES "file_instances"("id") ON DELETE SET NULL ON UPDATE CASCADE;

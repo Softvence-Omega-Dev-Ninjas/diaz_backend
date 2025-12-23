@@ -68,6 +68,8 @@ async function bootstrap() {
   );
 
   const port = parseInt(configService.get<string>(ENVEnum.PORT) ?? '5051', 10);
+  // -----------run local server run http:localhost:${port}-----------
+
   await app.listen(port);
 }
 
